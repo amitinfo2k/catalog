@@ -81,7 +81,7 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      cluster.x-k8s.io/cluster-name: my-cluster
+      cluster.x-k8s.io/cluster-name: workload
   template:
     spec:
       version: v1.29.0
