@@ -12,27 +12,111 @@ spec:
     services:
       cidrBlocks:
       - 10.128.0.0/12
-  topology:
-    class: docker
-    controlPlane:
-      metadata: {}
-      replicas: 1
-    variables:
-    - name: imageRepository
-      value: ""
-    - name: etcdImageTag
-      value: ""
-    - name: coreDNSImageTag
-      value: ""
-    - name: podSecurityStandard
-      value:
-        audit: restricted
-        enabled: true
-        enforce: baseline
-        warn: restricted
-    version: v1.26.3
-    workers:
-      machineDeployments:
-      - class: docker-default-worker
-        name: md-0
-        replicas: 1
+  controlPlaneRef:
+    apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+    kind: KubeadmControlPlane
+    name: controlplane
+    namespace: default
+  infrastructureRef:
+    apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+    kind: DockerCluster
+    name: workload
+    namespace: default
+
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: DockerCluster
+metadata:
+  name: workload
+  namespace: default
+---
+apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+kind: KubeadmControlPlane
+metadata:
+  name: controlplane
+  namespace: default
+spec:
+  replicas: 1
+  version: v1.29.0
+  machineTemplate:
+    infrastructureRef:
+      apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+      kind: DockerMachineTemplate
+      name: controlplane
+      namespace: default
+  kubeadmConfigSpec:
+    clusterConfiguration:
+      apiServer:
+        certSANs:
+        - localhost
+        - 127.0.0.1
+        - 0.0.0.0
+      extraArgs:
+        service-node-port-range: 2000-36767
+    initConfiguration:
+      nodeRegistration:
+        kubeletExtraArgs:
+          eviction-hard: nodefs.available<0%,nodefs.inodesFree<0%,imagefs.available<0%
+    joinConfiguration:
+      nodeRegistration:
+        kubeletExtraArgs:
+          eviction-hard: nodefs.available<0%,nodefs.inodesFree<0%,imagefs.available<0%
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: DockerMachineTemplate
+metadata:
+  name: controlplane
+  namespace: default
+spec:
+  template:
+    spec: {}
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachineDeployment
+metadata:
+  name: worker-md-0
+  namespace: default
+spec:
+  clusterName: workload
+  replicas: 1
+  selector:
+    matchLabels:
+      cluster.x-k8s.io/cluster-name: my-cluster
+  template:
+    spec:
+      version: v1.29.0
+      clusterName: workload
+      bootstrap:
+        configRef:
+          apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+          kind: KubeadmConfigTemplate
+          name: worker
+          namespace: default
+      infrastructureRef:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+        kind: DockerMachineTemplate
+        name: worker
+        namespace: default
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: DockerMachineTemplate
+metadata:
+  name: worker
+  namespace: default
+spec:
+  template:
+    spec: {}
+---
+apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+kind: KubeadmConfigTemplate
+metadata:
+  name: worker
+  namespace: default
+spec:
+  template:
+    spec:
+      joinConfiguration:
+        nodeRegistration:
+          kubeletExtraArgs:
+            eviction-hard: nodefs.available<0%,nodefs.inodesFree<0%,imagefs.available<0%
+  
