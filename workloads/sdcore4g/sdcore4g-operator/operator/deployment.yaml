@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: sdcore4g
+  namespace: omec
   name: sdcore4g-operator
 spec:
   replicas: 1
@@ -36,7 +36,7 @@ spec:
             cpu: 5m
             memory: 64Mi
       - name: operator
-        image: docker.io/amitinfo2k/sdcore-operator-go:v0.0.9
+        image: docker.io/amitinfo2k/sdcore-operator-go:0.0.9
         command:
         - /manager
         args:

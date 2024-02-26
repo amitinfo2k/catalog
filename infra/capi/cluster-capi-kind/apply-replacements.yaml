@@ -14,3 +14,8 @@ replacements:
       kind: Cluster
     fieldPaths:
     - metadata.name
+  - select:
+      kind: MachineDeployment
+    fieldPaths:
+    - spec.clusterName
+    - 
