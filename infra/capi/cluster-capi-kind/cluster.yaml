@@ -77,15 +77,15 @@ metadata:
   name: worker-md-0
   namespace: default
 spec:
-  clusterName: workload
+  clusterName: regional
   replicas: 1
   selector:
     matchLabels:
-      cluster.x-k8s.io/cluster-name: workload
+      cluster.x-k8s.io/cluster-name: regional
   template:
     spec:
       version: v1.26.3
-      clusterName: workload
+      clusterName: regional
       bootstrap:
         configRef:
           apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
