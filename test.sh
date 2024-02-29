@@ -40,3 +40,15 @@ for val in $StringVal3; do
  git tag nephio/optional/$val/v2.0.4
  git push origin nephio/optional/$val/v2.0.4
 done
+
+StringVal4="pkg-example-hss-bp pkg-example-mme-bp sdcore4g-operator"
+
+# Iterate the string variable using for loop
+for val in $StringVal4; do
+ echo $val
+ git tag workloads/sdcore4g/$val/v2.0.4
+ git push origin workloads/sdcore4g/$val/v2.0.4
+done
+
+
+
