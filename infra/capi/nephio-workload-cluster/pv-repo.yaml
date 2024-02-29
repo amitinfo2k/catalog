@@ -8,7 +8,7 @@ spec:
   upstream:
     package: repository
     repo: catalog-distros-sandbox
-    revision: v2.0.3
+    revision: v2.0.4
   downstream:
     package: example-repo
     repo: mgmt
