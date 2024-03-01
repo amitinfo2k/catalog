@@ -1,7 +1,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  namespace: sdcore4g
+  namespace: omec
   name: sdcore4g-operator-leader-election-role
 rules:
 - apiGroups:

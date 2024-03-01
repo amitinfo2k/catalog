@@ -13,7 +13,7 @@ for val in $StringVal; do
  git push origin infra/capi/$val/v2.0.4
 done
 
-StringVal1="configsync workload-crds"
+StringVal1="configsync workload-crds nephio-operator"
 
 # Iterate the string variable using for loop
 for val in $StringVal1; do
