@@ -1,0 +1,9 @@
+apiVersion: workload.nephio.org/v1alpha1
+kind: NFDeployment
+metadata:
+  name: pcrf
+  namespace: omec
+spec:
+  provider: pcrf.sdcore4g.io
+  capacity:
+    maxSubscribers: 10000
