@@ -5,3 +5,5 @@ metadata:
   namespace: hss-example
 spec:
   provider: hss.sdcore4g.io
+capacity:
+  maxSubscribers: 10000
