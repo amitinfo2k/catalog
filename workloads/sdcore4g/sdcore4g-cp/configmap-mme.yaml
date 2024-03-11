@@ -1,0 +1,213 @@
+---
+# Source: omec-control-plane/templates/configmap-mme.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mme-configs
+  labels:
+    release: sdcore4g
+    app: mme
+data:
+  s6a_fd.conf: |
+    Identity = "mme.default.svc.cluster.local";
+    Realm = "default.svc.cluster.local";
+    TLS_Cred = "conf/mme.cert.pem",
+               "conf/mme.key.pem";
+    TLS_CA = "conf/cacert.pem";
+    AppServThreads = 40;
+    SCTP_streams = 3;
+    NoRelay;
+    No_IPv6;
+    #Port = 3868;
+    #SecPort = 3869;
+
+    ConnectPeer = "hss.default.svc.cluster.local" { No_TLS; port = 3868; };
+
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_3gpp2_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_draftload_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_etsi283034_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc4004_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc4006bis_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc4072_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc4590_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc5447_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc5580_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc5777_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc5778_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc6734_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc6942_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc7155_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc7683_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc7944_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29061_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29128_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29154_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29173_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29212_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29214_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29215_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29217_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29229_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29272_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29273_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29329_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29336_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29337_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29338_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29343_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29344_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29345_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29368_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29468_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts32299_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_S6as6d.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_S6c.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_S6t.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_SGd.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_T6aT6bT7.fdx";
+  config.json: |-
+    {
+      "mme": {
+        "apnlist": {
+          "default": "spgwc",
+          "internet": "spgwc"
+        },
+        "code": 1,
+        "feature_list": {
+          "dcnr_support": "disabled"
+        },
+        "group_id": 1,
+        "logging": "debug",
+        "name": "vmmestandalone",
+        "plmnlist": {
+          "plmn1": "mcc=315,mnc=010",
+          "plmn2": "mcc=208,mnc=01"
+        },
+        "prom_port": 3081,
+        "security": {
+          "int_alg_list": "[EIA1, EIA2, EIA0]",
+          "sec_alg_list": "[EEA0, EEA1, EEA2]"
+        }
+      },
+      "s11": {
+        "egtp_default_port": 2123
+      },
+      "s1ap": {
+        "sctp_port": 36412
+      },
+      "s6a": {
+        "host": "hss.default.svc.cluster.local",
+        "host_type": "freediameter",
+        "realm": "default.svc.cluster.local"
+      }
+    }
+---
+# Source: omec-control-plane/templates/configmap-mme.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mme-scripts
+  labels:
+    release: sdcore4g
+    app: mme
+data:
+  mme-init.sh: |
+    #!/bin/sh
+    
+    # Copyright 2019-present Open Networking Foundation
+    #
+    # SPDX-License-Identifier: Apache-2.0
+    
+    set -ex
+    
+    cp /opt/mme/config/config.json /opt/mme/config/shared/config.json
+    cd /opt/mme/config/shared
+    
+    # Set local IP address for s1ap and s11 networks to the config
+    jq --arg MME_LOCAL_IP "$POD_IP" '.mme.ip_addr=$MME_LOCAL_IP' config.json > config.tmp && mv config.tmp config.json
+    jq --arg MME_LOCAL_IP "$POD_IP" '.s1ap.s1ap_local_addr=$MME_LOCAL_IP' config.json > config.tmp && mv config.tmp config.json
+    jq --arg MME_LOCAL_IP "$POD_IP" '.s11.egtp_local_addr=$MME_LOCAL_IP' config.json > config.tmp && mv config.tmp config.json
+    
+    # Set SPGWC address to the config
+    # We need to convert service domain name to actual IP address
+    # because mme apps does not take domain address - should be fixed in openmme
+    SPGWC_ADDR=$(dig +short +search spgwc)
+    jq --arg SPGWC_ADDR "$SPGWC_ADDR" '.s11.sgw_addr //= $SPGWC_ADDR' config.json > config.tmp && mv config.tmp config.json
+    jq --arg SPGWC_ADDR "$SPGWC_ADDR" '.s11.pgw_addr //= $SPGWC_ADDR' config.json > config.tmp && mv config.tmp config.json
+    
+    # Add additional redundant keys - should be fixed in openmme
+    HSS_TYPE=$(jq -r '.s6a.host_type' config.json)
+    HSS_HOST=$(jq -r '.s6a.host' config.json)
+    jq --arg HSS_TYPE "$HSS_TYPE" '.s6a.hss_type=$HSS_TYPE' config.json > config.tmp && mv config.tmp config.json
+    jq --arg HSS_HOST "$HSS_HOST" '.s6a.host_name=$HSS_HOST' config.json > config.tmp && mv config.tmp config.json
+    
+    # Copy the final configs for each applications
+    cp /opt/mme/config/shared/config.json /opt/mme/config/shared/mme.json
+    cp /opt/mme/config/shared/config.json /opt/mme/config/shared/s11.json
+    cp /opt/mme/config/shared/config.json /opt/mme/config/shared/s1ap.json
+    cp /opt/mme/config/shared/config.json /opt/mme/config/shared/s6a.json
+    cp /opt/mme/config/s6a_fd.conf /opt/mme/config/shared/s6a_fd.conf
+    
+    #This multiple copies of config needs some cleanup. For now I want 
+    #that after running mme_init config to be present in the target directory
+    cp /opt/mme/config/shared/* /openmme/target/conf/
+    
+    # Generate certs
+    MME_IDENTITY="mme.default.svc.cluster.local";
+    DIAMETER_HOST=$(echo $MME_IDENTITY | cut -d'.' -f1)
+    DIAMETER_REALM="default.svc.cluster.local";
+    
+    cp /openmme/target/conf/make_certs.sh /opt/mme/config/shared/make_certs.sh
+    cd /opt/mme/config/shared
+    ./make_certs.sh $DIAMETER_HOST $DIAMETER_REALM
+    
+  mme-run.sh: |
+    #!/bin/bash
+    
+    # Copyright 2019-present Open Networking Foundation
+    #
+    # SPDX-License-Identifier: Apache-2.0
+    
+    APPLICATION=$1
+    cp /openmme/target/bin/$APPLICATION /tmp/coredump/
+    
+    # copy config files to openmme target directly
+    cp /opt/mme/config/shared/* /openmme/target/conf/
+    
+    cd /openmme/target
+    export LD_LIBRARY_PATH=/usr/local/lib:./lib
+    
+    case $APPLICATION in
+        "mme-app")
+          echo "Starting mme-app"
+          echo "conf/mme.json"
+          cat conf/mme.json
+          ./bin/mme-app
+          ;;
+        "s1ap-app")
+          echo "Starting s1ap-app"
+          echo "conf/s1ap.json"
+          today=`date '+%Y_%m_%d__%H_%M_%S'`;
+          filename="/tmp/valgrind_output_s1ap_$today.txt"
+          echo $filename
+          cat conf/s1ap.json
+          ./bin/s1ap-app
+          ;;
+        "s6a-app")
+          echo "Starting s6a-app"
+          echo "conf/s6a.json"
+          cat conf/s6a.json
+          echo "conf/s6a_fd.conf"
+          cat conf/s6a_fd.conf
+          ./bin/s6a-app
+          ;;
+        "s11-app")
+          echo "Starting s11-app"
+          echo "conf/s11.json"
+          cat conf/s11.json
+          ./bin/s11-app
+          ;;
+        *)
+          echo "invalid app $APPLICATION"
+          ;;
+    esac

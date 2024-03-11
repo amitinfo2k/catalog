@@ -1,0 +1,141 @@
+---
+# Source: omec-control-plane/templates/statefulset-hss.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: hss
+  namespace: default
+  labels:
+    release: sdcore4g
+    app: hss
+---
+# Source: omec-control-plane/templates/statefulset-hss.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: hss
+  namespace: default
+  labels:
+    release: sdcore4g
+    app: hss
+rules:
+  - apiGroups:
+      - ""
+      - extensions
+      - batch
+      - apps
+    verbs:
+      - get
+      - list
+      - patch
+    resources:
+      - statefulsets
+      - daemonsets
+      - jobs
+      - pods
+      - services
+      - endpoints
+      - configmaps
+---
+# Source: omec-control-plane/templates/statefulset-hss.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: hss
+  namespace: default
+  labels:
+    release: sdcore4g
+    app: hss
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: hss
+subjects:
+  - kind: ServiceAccount
+    name: hss
+    namespace: default
+---
+# Source: omec-control-plane/templates/statefulset-hss.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: hss
+  labels:
+    release: sdcore4g
+    app: hss
+spec:
+  replicas: 1
+  serviceName: hss-headless
+  selector:
+    matchLabels:
+      release: sdcore4g
+      app: hss
+  template:
+    metadata:
+      labels:
+        release: sdcore4g
+        app: hss
+      annotations:
+        field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":9089,"schema":"HTTP"}]'
+        fluentbit.io/parser: hss
+    spec:
+      serviceAccountName: hss
+      initContainers:
+      - name: hss-bootstrap
+        image: omecproject/c3po-hssdb:master-df54425
+        imagePullPolicy: IfNotPresent
+        command: ["/opt/c3po/hss/scripts/hss-bootstrap.sh"]
+        volumeMounts:
+        - name: scripts
+          mountPath: /opt/c3po/hss/scripts
+      - name: hss-coredump-init
+        image: "omecproject/busybox:stable"
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        command: ["sh", "-xc"]
+        args:
+          - echo '/tmp/coredump/core.%h.%e.%t' > /mnt/host-rootfs/proc/sys/kernel/core_pattern
+        volumeMounts:
+          - name: host-rootfs
+            mountPath: /mnt/host-rootfs
+      containers:
+      - name: hss
+        image: omecproject/c3po-hss:master-df54425
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        stdin: true
+        tty: true
+        command: ["bash", "-c", "/opt/c3po/hss/scripts/hss-run.sh; sleep 3600"]
+        resources:
+          limits:
+            cpu: 2
+            memory: 1Gi
+          requests:
+            cpu: 2
+            memory: 1Gi
+        volumeMounts:
+        - name: scripts
+          mountPath: /opt/c3po/hss/scripts
+        - name: configs
+          mountPath: /etc/hss/conf
+        - name: coredump
+          mountPath: /tmp/coredump
+      volumes:
+      - name: scripts
+        configMap:
+          name: hss-scripts
+          defaultMode: 493
+      - name: configs
+        configMap:
+          name: hss-configs
+          defaultMode: 420
+      - name: host-rootfs
+        hostPath:
+          path: /
+      - name: coredump
+        hostPath:
+          path: /tmp/coredump

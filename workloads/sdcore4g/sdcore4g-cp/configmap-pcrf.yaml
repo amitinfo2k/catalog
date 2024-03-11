@@ -1,0 +1,258 @@
+---
+# Source: omec-control-plane/templates/configmap-pcrf.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pcrf-configs
+  labels:
+    release: sdcore4g
+    app: pcrf
+data:
+  acl.conf: |
+    ALLOW_OLD_TLS *.cluster.local
+  pcrf.conf: |
+    Identity = "pcrf.default.svc.cluster.local";
+    Realm = "default.svc.cluster.local";
+    TLS_Cred = "/opt/c3po/pcrf/conf/pcrf.cert.pem",
+               "/opt/c3po/pcrf/conf/pcrf.key.pem";
+    TLS_CA = "/opt/c3po/pcrf/conf/cacert.pem";
+    No_SCTP;
+    Prefer_TCP;
+    No_IPv6;
+    SCTP_streams = 3;
+    NoRelay;
+    AppServThreads = 4;
+    Port = 3868;
+    SecPort = 5868;
+    LoadExtension = "/usr/local/lib/freeDiameter/acl_wl.fdx" : "/opt/c3po/pcrf/conf/acl.conf";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_3gpp2_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_draftload_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_etsi283034_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc4004_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc4006bis_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc4072_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc4590_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc5447_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc5580_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc5777_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc5778_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc6734_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc6942_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc7155_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc7683_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc7944_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29061_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29128_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29154_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29173_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29212_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29214_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29215_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29217_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29229_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29272_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29273_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29329_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29336_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29337_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29338_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29343_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29344_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29345_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29368_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29468_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts32299_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_CreditControl.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_Gx.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_NAS.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_Rx.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_Sd.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_St.fdx";
+  oss.json: |-
+    {
+      "option": {
+        "id": "url",
+        "type": "string"
+      },
+      "services": [
+        {
+          "commands": [
+            {
+              "id": "describe_loggers"
+            },
+            {
+              "id": "set_logger_level",
+              "options": [
+                {
+                  "id": "name",
+                  "type": "string"
+                },
+                {
+                  "id": "level",
+                  "type": "integer"
+                }
+              ]
+            }
+          ],
+          "id": "logger"
+        },
+        {
+          "commands": [
+            {
+              "id": "describe_stats_frequency"
+            },
+            {
+              "id": "describe_stats_live"
+            },
+            {
+              "id": "set_stats_frequency",
+              "options": [
+                {
+                  "id": "frequency",
+                  "type": "integer"
+                }
+              ]
+            }
+          ],
+          "id": "stats"
+        }
+      ]
+    }
+  pcrf.json: |-
+    {
+      "common": {
+        "fdcfg": "conf/pcrf.conf",
+        "originhost": "pcrf.default.svc.cluster.local",
+        "originrealm": "default.svc.cluster.local",
+        "prom_port": 9089
+      },
+      "pcrf": {
+        "auditlogname": "",
+        "auditlognumber": 5,
+        "auditlogsize": 20,
+        "casscoreconnections": 2,
+        "cassdb": "vpcrf",
+        "casshost": "cassandra",
+        "cassioqueuesize": 32768,
+        "cassiothreads": 2,
+        "casskeyspace": "vpcrf",
+        "cassmaxconnections": 8,
+        "casspwd": "root",
+        "casssrv": "cassandra",
+        "cassusr": "root",
+        "concurrent": 10,
+        "gtwhost": "*",
+        "gtwport": 9080,
+        "logname": "",
+        "lognumber": 5,
+        "logqsize": 8192,
+        "logsize": 20,
+        "numworkers": 4,
+        "optkey": "63bfa50ee6523365ff14c1f45f88737d",
+        "ossfile": "conf/oss.json",
+        "ossport": 9082,
+        "randv": true,
+        "reloadkey": false,
+        "restport": 8080,
+        "rulesfile": "conf/subscriber_mapping.json",
+        "statfreq": 2000,
+        "statlogname": "",
+        "statlognumber": 5,
+        "statlogsize": 20,
+        "verifyroamingsubscribers": false
+      }
+    }
+  subscriber_mapping.json: |-
+    {
+      "Policies": {
+        "rules": {
+          "best-effort-internet-access": {
+            "definition": {
+              "Charging-Rule-Name": "best-effort-internet-access",
+              "Flow-Information": {
+                "Flow-Description": "permit out ip from 0.0.0.0/0 to assigned",
+                "Flow-Direction": 3
+              },
+              "Flow-Status": 2,
+              "QoS-Information": {
+                "Allocation-Retention-Priority": {
+                  "Pre-emption-Capability": 1,
+                  "Pre-emption-Vulnerability": 1,
+                  "Priority-Level": 1
+                },
+                "Guaranteed-Bitrate-DL": 0,
+                "Guaranteed-Bitrate-UL": 0,
+                "Max-Requested-Bandwidth-DL": 5120000,
+                "Max-Requested-Bandwidth-UL": 512000,
+                "QoS-Class-Identifier": 9
+              }
+            }
+          }
+        },
+        "service-groups": {
+          "internet": {
+            "default-activate-service": [
+              "be-internet-access"
+            ]
+          }
+        },
+        "services": {
+          "be-internet-access": {
+            "AMBR_DL": 10240000,
+            "AMBR_UL": 1024000,
+            "arp": 1,
+            "qci": 9,
+            "service-activation-rules": [
+              "best-effort-internet-access"
+            ]
+          }
+        }
+      }
+    }
+---
+# Source: omec-control-plane/templates/configmap-pcrf.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pcrf-scripts
+  labels:
+    release: sdcore4g
+    app: pcrf
+data:
+  pcrf-run.sh: |
+    #!/bin/bash
+    
+    # Copyright 2020-present Open Networking Foundation
+    #
+    # SPDX-License-Identifier: Apache-2.0
+    
+    set -ex
+    cp /bin/pcrf /tmp/coredump/
+    
+    CONF_DIR="/opt/c3po/pcrf/conf"
+    LOGS_DIR="/opt/c3po/pcrf/logs"
+    #TODO - Need to remove logs directory
+    mkdir -p $CONF_DIR $LOGS_DIR
+    
+    cp /etc/pcrf/conf/{acl.conf,pcrf.json,pcrf.conf,oss.json,subscriber_mapping.json} $CONF_DIR
+    cat $CONF_DIR/{pcrf.json,pcrf.conf}
+    
+    cd $CONF_DIR
+    make_certs.sh pcrf default.svc.cluster.local
+    
+    cd ..
+    pcrf -j $CONF_DIR/pcrf.json
+    
+  pcrf-bootstrap.sh: |
+    #!/bin/bash
+    
+    # Copyright 2020-present Open Networking Foundation
+    #
+    # SPDX-License-Identifier: Apache-2.0
+    
+    set -ex
+    
+    until cqlsh --file /opt/c3po/pcrfdb/pcrf_cassandra.cql cassandra;
+        do echo "Provisioning PCRFDB";
+        sleep 2;
+    done

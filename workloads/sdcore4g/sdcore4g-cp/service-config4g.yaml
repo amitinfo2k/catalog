@@ -1,0 +1,21 @@
+---
+# Source: omec-control-plane/templates/service-config4g.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: config4g
+  labels:
+    release: sdcore4g
+    app: config4g
+spec:
+  type: ClusterIP
+  selector:
+    release: sdcore4g
+    app: config4g
+  ports:
+  - name: prometheus-exporter
+    port: 9089
+    protocol: TCP
+  - name: urlport-http
+    port: 5000
+    protocol: TCP

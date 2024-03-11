@@ -1,0 +1,138 @@
+---
+# Source: omec-control-plane/templates/statefulset-pcrf.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: pcrf
+  namespace: default
+  labels:
+    release: sdcore4g
+    app: pcrf
+---
+# Source: omec-control-plane/templates/statefulset-pcrf.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: pcrf
+  namespace: default
+  labels:
+    release: sdcore4g
+    app: pcrf
+rules:
+  - apiGroups:
+      - ""
+      - extensions
+      - batch
+      - apps
+    verbs:
+      - get
+      - list
+      - patch
+    resources:
+      - statefulsets
+      - daemonsets
+      - jobs
+      - pods
+      - services
+      - endpoints
+      - configmaps
+---
+# Source: omec-control-plane/templates/statefulset-pcrf.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pcrf
+  namespace: default
+  labels:
+    release: sdcore4g
+    app: pcrf
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: pcrf
+subjects:
+  - kind: ServiceAccount
+    name: pcrf
+    namespace: default
+---
+# Source: omec-control-plane/templates/statefulset-pcrf.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: pcrf
+  labels:
+    release: sdcore4g
+    app: pcrf
+spec:
+  replicas: 1
+  serviceName: pcrf-headless
+  selector:
+    matchLabels:
+      release: sdcore4g
+      app: pcrf
+  template:
+    metadata:
+      labels:
+        release: sdcore4g
+        app: pcrf
+    spec:
+      serviceAccountName: pcrf
+      initContainers:
+      - name: pcrf-bootstrap
+        image: omecproject/c3po-pcrfdb:pcrf-d58dd1c
+        imagePullPolicy: IfNotPresent
+        command: ["/opt/c3po/pcrf/pcrf-bootstrap.sh"]
+        volumeMounts:
+        - name: scripts
+          mountPath: /opt/c3po/pcrf
+      - name: pcrf-coredump-init
+        image: "omecproject/busybox:stable"
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        command: ["sh", "-xc"]
+        args:
+          - echo '/tmp/coredump/core.%h.%e.%t' > /mnt/host-rootfs/proc/sys/kernel/core_pattern
+        volumeMounts:
+          - name: host-rootfs
+            mountPath: /mnt/host-rootfs
+      containers:
+      - name: pcrf
+        image: omecproject/c3po-pcrf:pcrf-d58dd1c
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        stdin: true
+        tty: true
+        command: ["bash", "-c", "/opt/c3po/pcrf/scripts/pcrf-run.sh"]
+        resources:
+          limits:
+            cpu: 2
+            memory: 1Gi
+          requests:
+            cpu: 2
+            memory: 1Gi
+        volumeMounts:
+        - name: scripts
+          mountPath: /opt/c3po/pcrf/scripts
+        - name: configs
+          mountPath: /etc/pcrf/conf
+        - name: coredump
+          mountPath: /tmp/coredump
+      volumes:
+      - name: scripts
+        configMap:
+          name: pcrf-scripts
+          defaultMode: 493
+      - name: configs
+        configMap:
+          name: pcrf-configs
+          defaultMode: 420
+      - name: host-rootfs
+        hostPath:
+          path: /
+      - name: coredump
+        hostPath:
+          path: /tmp/coredump

@@ -1,0 +1,37 @@
+---
+# Source: omec-control-plane/templates/service-mme.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: mme
+  labels:
+    release: sdcore4g
+    app: mme
+spec:
+  type: NodePort
+  selector:
+    release: sdcore4g
+    app: mme
+  ports:
+    - name: s11
+      port: 2123
+      protocol: UDP
+      nodePort: 32124
+    - name: s6a
+      port: 3868
+      protocol: TCP
+      nodePort: 33869
+    - name: prometheus-exporter
+      port: 3081
+      protocol: TCP
+      nodePort: 30085
+    - name: s1ap
+      port: 36412
+      protocol: SCTP
+      nodePort: 36412
+    - name: mme-app-config
+      port: 8080
+      protocol: TCP
+    - name: mme-s1ap-config
+      port: 8081
+      protocol: TCP

@@ -1,0 +1,198 @@
+---
+# Source: omec-control-plane/templates/statefulset-spgwc.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: spgwc
+  namespace: default
+  labels:
+    release: sdcore4g
+    app: spgwc
+---
+# Source: omec-control-plane/templates/statefulset-spgwc.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: spgwc
+  namespace: default
+  labels:
+    release: sdcore4g
+    app: spgwc
+rules:
+  - apiGroups:
+      - ""
+      - extensions
+      - batch
+      - apps
+    verbs:
+      - get
+      - list
+      - patch
+    resources:
+      - statefulsets
+      - daemonsets
+      - jobs
+      - pods
+      - services
+      - endpoints
+      - configmaps
+---
+# Source: omec-control-plane/templates/statefulset-spgwc.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: spgwc
+  namespace: default
+  labels:
+    release: sdcore4g
+    app: spgwc
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: spgwc
+subjects:
+  - kind: ServiceAccount
+    name: spgwc
+    namespace: default
+---
+# Source: omec-control-plane/templates/statefulset-spgwc.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: spgwc
+  labels:
+    release: sdcore4g
+    app: spgwc
+spec:
+  replicas: 1
+  serviceName: spgwc-headless
+  selector:
+    matchLabels:
+      release: sdcore4g
+      app: spgwc
+  template:
+    metadata:
+      labels:
+        release: sdcore4g
+        app: spgwc
+      annotations:
+        field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":9089,"schema":"HTTP"}]'
+        fluentbit.io/parser: spgwc
+    spec:
+      serviceAccountName: spgwc
+      initContainers:
+      - name: spgwc-coredump-init
+        image: "omecproject/busybox:stable"
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        command: ["sh", "-xc"]
+        args:
+          - echo '/tmp/coredump/core.%h.%e.%t' > /mnt/host-rootfs/proc/sys/kernel/core_pattern
+        volumeMounts:
+          - name: host-rootfs
+            mountPath: /mnt/host-rootfs
+      containers:
+      - name: spgwc
+        image: omecproject/spgw:master-e419062
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        stdin: true
+        tty: true
+        command: ["bash", "-xc"]
+        args: 
+        - /opt/cp/scripts/spgwc-run.sh ngic_controlplane
+        livenessProbe:
+          httpGet:
+            path: /liveness
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 3
+        readinessProbe:
+          httpGet:
+            path: /readiness
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 3
+        startupProbe:
+          #looks like available only in 1.16 K8s version and above
+          httpGet:
+            path: /startup
+            port: 8080
+          initialDelaySeconds: 20
+          failureThreshold: 30
+          periodSeconds: 10
+        env:
+        - name: MEM_LIMIT
+          valueFrom:
+            resourceFieldRef:
+              containerName: spgwc
+              resource: limits.memory
+              divisor: 1Mi
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        resources:
+          limits:
+            cpu: 2
+            memory: 5Gi
+          requests:
+            cpu: 2
+            memory: 5Gi
+        volumeMounts:
+        - name: scripts
+          mountPath: /opt/cp/scripts
+        - name: configs
+          mountPath: /etc/cp/config
+        - name: shared-app
+          mountPath: /tmp
+        - name: coredump
+          mountPath: /tmp/coredump
+      - name: gx-app
+        image: omecproject/spgw:master-e419062
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        stdin: true
+        tty: true
+        command: ["bash", "-xc"]
+        args:
+        - /opt/cp/scripts/spgwc-run.sh gx-app
+        resources:
+          limits:
+            cpu: 2
+            memory: 5Gi
+          requests:
+            cpu: 2
+            memory: 5Gi
+        volumeMounts:
+        - name: scripts
+          mountPath: /opt/cp/scripts
+        - name: configs
+          mountPath: /etc/cp/config
+        - name: shared-app
+          mountPath: /tmp
+        - name: coredump
+          mountPath: /tmp/coredump
+      volumes:
+      - name: scripts
+        configMap:
+          name: spgwc-scripts
+          defaultMode: 493
+      - name: configs
+        configMap:
+          name: spgwc-configs
+          defaultMode: 420
+      - name: shared-app
+        emptyDir: {}
+      - name: host-rootfs
+        hostPath:
+          path: /
+      - name: coredump
+        hostPath:
+          path: /tmp/coredump
