@@ -15,7 +15,7 @@ spec:
       app: cassandra
       release: sdcore4g
   serviceName: cassandra
-  replicas: 1
+  replicas: 3 # kpt-set: ${cassandra-replicas}
   podManagementPolicy: OrderedReady
   updateStrategy:
     type: OnDelete

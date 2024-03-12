@@ -1,0 +1,8 @@
+# apply-setters-fn-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: apply-setters-fn-config
+data:
+  cassandra-replicas: "1"
+
