@@ -166,11 +166,11 @@ spec:
         - /opt/mme/scripts/mme-run.sh mme-app
         resources:
           limits:
-            cpu: 0.5
-            memory: 1Gi
+            cpu: 0.1
+            memory: 250Mi
           requests:
-            cpu: 0.5
-            memory: 1Gi
+            cpu: 0.1
+            memory: 250Mi
         env:
         - name: POD_IP
           valueFrom:
@@ -200,11 +200,11 @@ spec:
         - /opt/mme/scripts/mme-run.sh s1ap-app
         resources:
           limits:
-            cpu: 0.5
-            memory: 1Gi
+            cpu: 0.2
+            memory: 250Mi
           requests:
-            cpu: 0.5
-            memory: 1Gi
+            cpu: 0.2
+            memory: 250Mi
         env:
         - name: MMERUNENV
           value: "container"
@@ -230,11 +230,11 @@ spec:
         - /opt/mme/scripts/mme-run.sh s6a-app
         resources:
           limits:
-            cpu: 0.5
-            memory: 1Gi
+            cpu: 0.2
+            memory: 250Mi
           requests:
-            cpu: 0.5
-            memory: 1Gi
+            cpu: 0.2
+            memory: 250Mi
         env:
         - name: MMERUNENV
           value: "container"
@@ -258,11 +258,11 @@ spec:
         - /opt/mme/scripts/mme-run.sh s11-app
         resources:
           limits:
-            cpu: 0.5
-            memory: 1Gi
+            cpu: 0.2
+            memory: 250Mi
           requests:
-            cpu: 0.5
-            memory: 1Gi
+            cpu: 0.2
+            memory: 250Mi
         env:
         - name: MMERUNENV
           value: "container"

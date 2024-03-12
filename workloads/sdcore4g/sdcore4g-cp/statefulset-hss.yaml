@@ -112,11 +112,11 @@ spec:
         command: ["bash", "-c", "/opt/c3po/hss/scripts/hss-run.sh; sleep 3600"]
         resources:
           limits:
-            cpu: 2
-            memory: 1Gi
+            cpu: 0.2
+            memory: 250Mi
           requests:
-            cpu: 2
-            memory: 1Gi
+            cpu: 0.2
+            memory: 250Mi
         volumeMounts:
         - name: scripts
           mountPath: /opt/c3po/hss/scripts

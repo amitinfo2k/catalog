@@ -138,11 +138,11 @@ spec:
               fieldPath: status.podIP
         resources:
           limits:
-            cpu: 2
-            memory: 5Gi
+            cpu: 0.2
+            memory: 250Mi
           requests:
-            cpu: 2
-            memory: 5Gi
+            cpu: 0.2
+            memory: 250Mi
         volumeMounts:
         - name: scripts
           mountPath: /opt/cp/scripts

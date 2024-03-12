@@ -109,11 +109,11 @@ spec:
         command: ["bash", "-c", "/opt/c3po/pcrf/scripts/pcrf-run.sh"]
         resources:
           limits:
-            cpu: 2
-            memory: 1Gi
+            cpu: 0.1
+            memory: 250Mi
           requests:
-            cpu: 2
-            memory: 1Gi
+            cpu: 0.1
+            memory: 250Mi
         volumeMounts:
         - name: scripts
           mountPath: /opt/c3po/pcrf/scripts
