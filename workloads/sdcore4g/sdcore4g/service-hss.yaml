@@ -1,0 +1,24 @@
+---
+# Source: omec-control-plane/templates/service-hss.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: hss
+  labels:
+    release: sdcore4g
+    app: hss
+spec:
+  type: ClusterIP
+  selector:
+    release: sdcore4g
+    app: hss
+  ports:
+  - name: s6a
+    port: 3868
+    protocol: TCP
+  - name: config-port
+    port: 8080
+    protocol: TCP
+  - name: prometheus-exporter
+    port: 9089
+    protocol: TCP

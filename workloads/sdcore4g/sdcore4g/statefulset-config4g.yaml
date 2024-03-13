@@ -1,0 +1,123 @@
+---
+# Source: omec-control-plane/templates/statefulset-config4g.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: config4g
+  namespace: default
+  labels:
+    release: sdcore4g
+    app: config4g
+---
+# Source: omec-control-plane/templates/statefulset-config4g.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: config4g
+  namespace: default
+  labels:
+    release: sdcore4g
+    app: config4g
+rules:
+  - apiGroups:
+      - ""
+      - extensions
+      - batch
+      - apps
+    verbs:
+      - get
+      - list
+      - patch
+    resources:
+      - statefulsets
+      - daemonsets
+      - jobs
+      - pods
+      - services
+      - endpoints
+      - configmaps
+---
+# Source: omec-control-plane/templates/statefulset-config4g.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: config4g
+  namespace: default
+  labels:
+    release: sdcore4g
+    app: config4g
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: config4g
+subjects:
+  - kind: ServiceAccount
+    name: config4g
+    namespace: default
+---
+# Source: omec-control-plane/templates/statefulset-config4g.yaml
+apiVersion: apps/v1
+kind: StatefulSet 
+metadata:
+  name: config4g
+  labels:
+    release: sdcore4g
+    app: config4g
+spec:
+  replicas: 1
+  serviceName: config4g-headless
+  selector:
+    matchLabels:
+      release: sdcore4g
+      app: config4g
+  template:
+    metadata:
+      labels:
+        release: sdcore4g
+        app: config4g
+      annotations:
+        field.cattle.io/workloadMetrics: '[{"path":"/metrics","port":9089,"schema":"HTTP"}]'
+    spec:
+      serviceAccountName: config4g
+      containers:
+      - name: config-4g
+        image: omecproject/5gc-webui:master-1121545
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          runAsUser: 0
+        stdin: true
+        tty: true
+        command: ["/free5gc/script/config4g-run.sh"]
+        env:
+        - name: CONFIGPOD_DEPLOYMENT
+          value: "4G"
+        resources:
+          limits:
+            cpu: 0.2
+            memory: 250Mi
+          requests:
+            cpu: 0.2
+            memory: 250Mi
+        volumeMounts:
+        - name: run-script
+          mountPath: /free5gc/script/config4g-run.sh
+          subPath: config4g-run.sh
+        - name: nf-config
+          mountPath: /free5gc/config
+        - name: coredump
+          mountPath: /tmp/coredump
+      volumes:
+      - name: run-script
+        configMap:
+          name: config4g
+          defaultMode: 493
+      - name: nf-config
+        configMap:
+          name: config4g
+          defaultMode: 493
+      - name: host-rootfs
+        hostPath:
+          path: /
+      - name: coredump
+        hostPath:
+          path: /tmp/coredump

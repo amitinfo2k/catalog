@@ -1,0 +1,24 @@
+---
+# Source: omec-control-plane/templates/service-pcrf.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: pcrf
+  labels:
+    release: sdcore4g
+    app: pcrf
+spec:
+  type: ClusterIP
+  selector:
+    release: sdcore4g
+    app: pcrf
+  ports:
+  - name: gx
+    port: 3868
+    protocol: TCP
+  - name: prometheus-exporter
+    port: 9089
+    protocol: TCP
+  - name: config-port
+    port: 8080
+    protocol: TCP

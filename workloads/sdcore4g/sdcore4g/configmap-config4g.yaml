@@ -1,0 +1,51 @@
+---
+# Source: omec-control-plane/templates/configmap-config4g.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config4g
+  labels:
+    release: sdcore4g
+    app: config4g
+data:
+  config4g-run.sh: |
+    #!/bin/sh
+    
+    # Copyright 2020-present Open Networking Foundation
+    #
+    # SPDX-License-Identifier: Apache-2.0
+    
+    set -xe
+    cp /free5gc/webconsole/webconsole /tmp/coredump/
+    
+    cd /free5gc
+    
+    cat config/webuicfg.conf
+    
+    ./webconsole/webconsole -webuicfg config/webuicfg.conf
+    
+  webuicfg.conf: |-
+    configuration:
+      endpoints:
+      - configCheckUrl: http://spgwc:8080/v1/config-check
+        configPushUrl: http://spgwc:8080/v1/config
+        type: spgw
+      - configCheckUrl: http://mme:8081/v1/config-check
+        configPushUrl: http://mme:8081/v1/config/slice
+        type: mme-s1ap
+      - configCheckUrl: http://hss:8080/v2/config-check
+        configPushUrl: http://hss:8080/v2/config/imsis
+        type: hss
+      - configCheckUrl: http://pcrf:8080/v1/config-check
+        configPushUrl: http://pcrf:8080/v1/config/policies
+        type: pcrf
+      managedByConfigPod:
+        enabled: false
+      spec-compliant-sdf: false
+    info:
+      description: WebUI initial local configuration
+      version: 1.0.0
+    logger:
+      WEBUI:
+        ReportCaller: false
+        debugLevel: info

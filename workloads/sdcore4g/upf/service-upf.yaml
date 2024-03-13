@@ -1,0 +1,39 @@
+---
+# Source: bess-upf/templates/service-upf.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: upf
+  labels:
+    release: bess-upf
+    app: upf
+spec:
+  type: ClusterIP
+  selector:
+    release: bess-upf
+    app: upf
+  ports:
+  - name: pfcp
+    protocol: UDP
+    port: 8805
+---
+# Source: bess-upf/templates/service-upf.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: upf-http
+  labels:
+    release: bess-upf
+    app: upf
+spec:
+  type: ClusterIP
+  selector:
+    release: bess-upf
+    app: upf
+  ports:
+  - name: bess-web
+    protocol: TCP
+    port: 8000
+  - name: prometheus-exporter
+    protocol: TCP
+    port: 8080

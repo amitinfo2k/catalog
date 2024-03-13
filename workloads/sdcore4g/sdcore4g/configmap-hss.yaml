@@ -1,0 +1,311 @@
+---
+# Source: omec-control-plane/templates/configmap-hss.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hss-configs
+  labels:
+    release: sdcore4g
+    app: hss
+data:
+  acl.conf: |
+    ALLOW_OLD_TLS *.cluster.local
+  hss.conf: |
+    Identity = "hss.default.svc.cluster.local";
+    Realm = "default.svc.cluster.local";
+    TLS_Cred = "/opt/c3po/hss/conf/hss.cert.pem",
+               "/opt/c3po/hss/conf/hss.key.pem";
+    TLS_CA = "/opt/c3po/hss/conf/cacert.pem";
+    No_SCTP;
+    Prefer_TCP;
+    No_IPv6;
+    SCTP_streams = 3;
+    NoRelay;
+    AppServThreads = 4;
+    Port = 3868;
+    SecPort = 5868;
+    LoadExtension = "/usr/local/lib/freeDiameter/acl_wl.fdx" : "/opt/c3po/hss/conf/acl.conf";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_3gpp2_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_draftload_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_etsi283034_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc4004_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc4006bis_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc4072_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc4590_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc5447_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc5580_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc5777_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc5778_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc6734_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc6942_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc7155_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc7683_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_rfc7944_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29061_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29128_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29154_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29173_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29212_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29214_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29215_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29217_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29229_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29272_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29273_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29329_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29336_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29337_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29338_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29343_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29344_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29345_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29368_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts29468_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_ts32299_avps.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_S6as6d.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_S6t.fdx";
+    LoadExtension = "/usr/local/lib/freeDiameter/dict_S6c.fdx";
+  hss.json: |-
+    {
+      "common": {
+        "fdcfg": "conf/hss.conf",
+        "originhost": "hss.default.svc.cluster.local",
+        "originrealm": "default.svc.cluster.local",
+        "prom_port": 9089
+      },
+      "hss": {
+        "auditlogname": "",
+        "auditlognumber": 5,
+        "auditlogsize": 20,
+        "casscoreconnections": 2,
+        "cassdb": "vhss",
+        "cassioqueuesize": 32768,
+        "cassiothreads": 2,
+        "cassmaxconnections": 8,
+        "casspwd": "root",
+        "casssrv": "cassandra",
+        "cassusr": "root",
+        "concurrent": 10,
+        "gtwhost": "*",
+        "gtwport": 9080,
+        "logname": "",
+        "lognumber": 5,
+        "logqsize": 8192,
+        "logsize": 20,
+        "numworkers": 4,
+        "optkey": "63bfa50ee6523365ff14c1f45f88737d",
+        "ossfile": "conf/oss.json",
+        "ossport": 9082,
+        "randv": true,
+        "reloadkey": false,
+        "restport": 8080,
+        "statfreq": 2000,
+        "statlogname": "",
+        "statlognumber": 5,
+        "statlogsize": 20,
+        "verifyroamingsubscribers": false
+      }
+    }
+  oss.json: |-
+    {
+      "option": {
+        "id": "url",
+        "type": "string"
+      },
+      "services": [
+        {
+          "commands": [
+            {
+              "id": "describe_loggers"
+            },
+            {
+              "id": "set_logger_level",
+              "options": [
+                {
+                  "id": "name",
+                  "type": "string"
+                },
+                {
+                  "id": "level",
+                  "type": "integer"
+                }
+              ]
+            }
+          ],
+          "id": "logger"
+        },
+        {
+          "commands": [
+            {
+              "id": "describe_stats_frequency"
+            },
+            {
+              "id": "describe_stats_live"
+            },
+            {
+              "id": "set_stats_frequency",
+              "options": [
+                {
+                  "id": "frequency",
+                  "type": "integer"
+                }
+              ]
+            }
+          ],
+          "id": "stats"
+        }
+      ]
+    }
+---
+# Source: omec-control-plane/templates/configmap-hss.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hss-scripts
+  labels:
+    release: sdcore4g
+    app: hss
+data:
+  hss-run.sh: |
+    #!/bin/bash
+    
+    # Copyright 2019-present Open Networking Foundation
+    #
+    # SPDX-License-Identifier: Apache-2.0
+    
+    set -ex
+    cp /bin/hss /tmp/coredump/
+    
+    CONF_DIR="/opt/c3po/hss/conf"
+    LOGS_DIR="/opt/c3po/hss/logs"
+    mkdir -p $CONF_DIR $LOGS_DIR
+    
+    cp /etc/hss/conf/{acl.conf,hss.json,hss.conf,oss.json} $CONF_DIR
+    cat $CONF_DIR/{hss.json,hss.conf}
+    
+    cd $CONF_DIR
+    make_certs.sh hss default.svc.cluster.local
+    
+    cd ..
+    hss -j $CONF_DIR/hss.json
+    
+  hss-bootstrap.sh: |
+    #!/bin/bash
+    
+    # Copyright 2018 Intel Corporation
+    # Copyright 2019-present Open Networking Foundation
+    #
+    # SPDX-License-Identifier: Apache-2.0
+    
+    set -ex
+    
+    function provision_users() {
+        count=${1}
+        imsi=${2}
+        msisdn=${3}
+        apn=${4}
+        key=${5}
+        opc=${6}
+        sqn=${7}
+        cassandra_ip=${8}
+        mmeidentity=${9}
+        mmerealm=${10}
+    
+        for (( i=1; i<=$count; i++ ))
+        do
+            echo "IMSI=$imsi MSISDN=$msisdn"
+            cqlsh $cassandra_ip -e "INSERT INTO vhss.users_imsi (imsi, msisdn, access_restriction, key, opc, mmehost, mmeidentity_idmmeidentity, mmerealm, rand, sqn, subscription_data, supported_features) VALUES ('$imsi', $msisdn, 41, '$key', '$opc','$mmeidentity', 3, '$mmerealm', '2683b376d1056746de3b254012908e0e', $sqn, '{\"Subscription-Data\":{\"Access-Restriction-Data\":41,\"Subscriber-Status\":0,\"Network-Access-Mode\":2,\"Regional-Subscription-Zone-Code\":[\"0x0123\",\"0x4567\",\"0x89AB\",\"0xCDEF\",\"0x1234\",\"0x5678\",\"0x9ABC\",\"0xDEF0\",\"0x2345\",\"0x6789\"],\"MSISDN\":\"0x$msisdn\",\"AMBR\":{\"Max-Requested-Bandwidth-UL\":50000000,\"Max-Requested-Bandwidth-DL\":100000000},\"APN-Configuration-Profile\":{\"Context-Identifier\":0,\"All-APN-Configurations-Included-Indicator\":0,\"APN-Configuration\":{\"Context-Identifier\":0,\"PDN-Type\":0,\"Served-Party-IP-Address\":[\"0.0.0.0\"],\"Service-Selection\":\"$apn\",\"EPS-Subscribed-QoS-Profile\":{\"QoS-Class-Identifier\":9,\"Allocation-Retention-Priority\":{\"Priority-Level\":15,\"Pre-emption-Capability\":0,\"Pre-emption-Vulnerability\":0}},\"AMBR\":{\"Max-Requested-Bandwidth-UL\":50000000,\"Max-Requested-Bandwidth-DL\":100000000},\"PDN-GW-Allocation-Type\":0,\"MIP6-Agent-Info\":{\"MIP-Home-Agent-Address\":[\"172.26.17.183\"]}}},\"Subscribed-Periodic-RAU-TAU-Timer\":0}}', '{\"Supported-Features\":{\"Vendor-Id\": 10415, \"Feature-List-ID\": 2, \"Feature-List\": 134217728}}');"
+    
+            if [ $? -ne 0 ];then
+               echo -e "oops! Something went wrong adding $imsi to vhss.users_imsi!\n"
+               exit 1
+            fi
+    
+            cqlsh $cassandra_ip -e "INSERT INTO vhss.msisdn_imsi (msisdn, imsi) VALUES ($msisdn, '$imsi');"
+            if [ $? -ne 0 ];then
+               echo -e "oops! Something went wrong adding $imsi to vhss.msisdn_imsi!\n"
+               exit 1
+            fi
+    
+            echo -e "Added $imsi\n"
+    
+            imsi=`expr $imsi + 1`;
+            msisdn=`expr $msisdn + 1`
+        done
+    }
+    
+    function provision_staticusers() {
+        imsi=${1}
+        msisdn=${2}
+        apn=${3}
+        key=${4}
+        opc=${5}
+        sqn=${6}
+        cassandra_ip=${7}
+        mmeidentity=${8}
+        mmerealm=${9}
+        staticAddr=${10}
+    
+        echo "IMSI=$imsi MSISDN=$msisdn"
+        cqlsh $cassandra_ip -e "INSERT INTO vhss.users_imsi (imsi, msisdn, access_restriction, key, opc, mmehost, mmeidentity_idmmeidentity, mmerealm, rand, sqn, subscription_data, supported_features) VALUES ('$imsi', $msisdn, 41, '$key', '$opc','$mmeidentity', 3, '$mmerealm', '2683b376d1056746de3b254012908e0e', $sqn, '{\"Subscription-Data\":{\"Access-Restriction-Data\":41,\"Subscriber-Status\":0,\"Network-Access-Mode\":2,\"Regional-Subscription-Zone-Code\":[\"0x0123\",\"0x4567\",\"0x89AB\",\"0xCDEF\",\"0x1234\",\"0x5678\",\"0x9ABC\",\"0xDEF0\",\"0x2345\",\"0x6789\"],\"MSISDN\":\"0x$msisdn\",\"AMBR\":{\"Max-Requested-Bandwidth-UL\":50000000,\"Max-Requested-Bandwidth-DL\":100000000},\"APN-Configuration-Profile\":{\"Context-Identifier\":0,\"All-APN-Configurations-Included-Indicator\":0,\"APN-Configuration\":{\"Context-Identifier\":0,\"PDN-Type\":0,\"Served-Party-IP-Address\":[\"$staticAddr\"],\"Service-Selection\":\"$apn\",\"EPS-Subscribed-QoS-Profile\":{\"QoS-Class-Identifier\":9,\"Allocation-Retention-Priority\":{\"Priority-Level\":15,\"Pre-emption-Capability\":0,\"Pre-emption-Vulnerability\":0}},\"AMBR\":{\"Max-Requested-Bandwidth-UL\":50000000,\"Max-Requested-Bandwidth-DL\":100000000},\"PDN-GW-Allocation-Type\":0,\"MIP6-Agent-Info\":{\"MIP-Home-Agent-Address\":[\"172.26.17.183\"]}}},\"Subscribed-Periodic-RAU-TAU-Timer\":0}}', '{\"Supported-Features\":{\"Vendor-Id\": 10415, \"Feature-List-ID\": 2, \"Feature-List\": 134217728}}');"
+    
+        cqlsh $cassandra_ip -e "INSERT INTO vhss.msisdn_imsi (msisdn, imsi) VALUES ($msisdn, '$imsi');"
+        echo -e "Added $imsi\n"
+    }
+    
+    function provision_mme() {
+        id=$1
+        isdn=$2
+        host=$3
+        realm=$4
+        uereachability=$5
+        cassandra_ip=$6
+    
+        cqlsh $cassandra_ip -e "INSERT INTO vhss.mmeidentity (idmmeidentity, mmeisdn, mmehost, mmerealm, ue_reachability) VALUES ($id, '$isdn', '$host', '$realm', $uereachability);"
+        if [ $? -ne 0 ];then
+           echo -e "oops! Something went wrong adding to vhss.mmeidentity!\n"
+           exit 1
+        fi
+    
+        cqlsh $cassandra_ip -e "INSERT INTO vhss.mmeidentity_host (idmmeidentity, mmeisdn, mmehost, mmerealm, ue_reachability) VALUES ($id, '$isdn', '$host', '$realm', $uereachability);"
+        if [ $? -ne 0 ];then
+           echo -e "oops! Something went wrong adding to vhss.mmeidentity_host!\n"
+           exit 1
+        fi
+    
+        echo -e "Added mme $id\n"
+    }
+    
+    until cqlsh --file /opt/c3po/hssdb/oai_db.cql cassandra;
+        do echo "Provisioning HSSDB";
+        sleep 2;
+    done
+    provision_users \
+        10 \
+        208014567891200 \
+        1122334455 \
+        internet \
+        465b5ce8b199b49faa5f0a2ee238a6bc \
+        d4416644f6154936193433dd20a0ace0 \
+        96 \
+        cassandra \
+        mme.omec.svc.cluster.local \
+        omec.svc.cluster.local
+    provision_staticusers \
+        208014567891200 \
+        1122334455 \
+        internet \
+        465b5ce8b199b49faa5f0a2ee238a6bc \
+        d4416644f6154936193433dd20a0ace0 \
+        96 \
+        cassandra \
+        mme.omec.svc.cluster.local \
+        omec.svc.cluster.local \
+        0.0.0.0
+    provision_mme \
+        1 \
+        19136246000 \
+        mme.omec.svc.cluster.local \
+        omec.svc.cluster.local \
+        1 \
+        cassandra
