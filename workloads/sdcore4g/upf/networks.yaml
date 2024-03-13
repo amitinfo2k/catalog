@@ -4,6 +4,7 @@ apiVersion: "k8s.cni.cncf.io/v1"
 kind: NetworkAttachmentDefinition
 metadata:
   name: access-net
+  namespace: omec
 spec:
   config: '{
     "cniVersion": "0.3.1",
@@ -19,6 +20,7 @@ apiVersion: "k8s.cni.cncf.io/v1"
 kind: NetworkAttachmentDefinition
 metadata:
   name: core-net
+  namespace: omec
 spec:
   config: '{
     "cniVersion": "0.3.1",

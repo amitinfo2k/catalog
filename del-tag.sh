@@ -41,7 +41,7 @@ for val in $StringVal3; do
  git push origin :nephio/optional/$val/v2.0.4
 done
 
-StringVal4="pkg-example-hss-bp pkg-example-mme-bp sdcore4g-operator pkg-example-pcrf-bp pkg-example-spgwc-bp pkg-example-config4g-bp sdcore4g-cp"
+StringVal4="pkg-example-hss-bp pkg-example-mme-bp sdcore4g-operator pkg-example-pcrf-bp pkg-example-spgwc-bp pkg-example-config4g-bp sdcore4g-cp sdcore4g upf"
 
 # Iterate the string variable using for loop
 for val in $StringVal4; do

@@ -4,6 +4,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: upf
+  namespace: omec
   labels:
     release: bess-upf
     app: upf
