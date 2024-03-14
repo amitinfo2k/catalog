@@ -84,7 +84,7 @@ spec:
       cluster.x-k8s.io/cluster-name: regional
   template:
     spec:
-      version: v1.26.3
+      version: v1.29.0
       clusterName: workload
       bootstrap:
         configRef:
