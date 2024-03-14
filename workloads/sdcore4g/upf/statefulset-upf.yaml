@@ -6,19 +6,19 @@ metadata:
   name: upf
   namespace: omec
   labels:
-    release: bess-upf
+    release: upf
     app: upf
 spec:
   replicas: 1
   serviceName: upf-headless
   selector:
     matchLabels:
-      release: bess-upf
+      release: upf
       app: upf
   template:
     metadata:
       labels:
-        release: bess-upf
+        release: upf
         app: upf
       annotations:
         k8s.v1.cni.cncf.io/networks: '[
@@ -43,8 +43,8 @@ spec:
         imagePullPolicy: "IfNotPresent"
         command: ["sh", "-xec"]
         args:
-        - ip route replace 192.168.251.0/24 via 192.168.252.1;
-          ip route replace default via 192.168.250.1 metric 110;
+        - ip route replace 192.168.251.0/24 via ;
+          ip route replace default via  metric 110;
           iptables -I OUTPUT -p icmp --icmp-type port-unreachable -j DROP;
         securityContext:
           capabilities:
@@ -150,10 +150,10 @@ spec:
           - |
             while true; do
               # arping does not work - BESS graph is still disconnected
-              #arping -c 2 -I access 192.168.252.1
-              #arping -c 2 -I core 192.168.250.1
-              ping -c 2 192.168.252.1
-              ping -c 2 192.168.250.1
+              #arping -c 2 -I access 
+              #arping -c 2 -I core 
+              ping -c 2 
+              ping -c 2 
               sleep 10
             done
         resources:

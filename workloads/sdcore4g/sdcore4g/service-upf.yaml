@@ -5,12 +5,12 @@ kind: Service
 metadata:
   name: upf
   labels:
-    release: bess-upf
+    release: upf
     app: upf
 spec:
   type: ClusterIP
   selector:
-    release: bess-upf
+    release: upf
     app: upf
   ports:
   - name: pfcp
@@ -23,12 +23,12 @@ kind: Service
 metadata:
   name: upf-http
   labels:
-    release: bess-upf
+    release: upf
     app: upf
 spec:
   type: ClusterIP
   selector:
-    release: bess-upf
+    release: upf
     app: upf
   ports:
   - name: bess-web
