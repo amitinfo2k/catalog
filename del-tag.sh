@@ -52,5 +52,12 @@ for val in $StringVal4; do
  git push origin :workloads/sdcore4g/$val/$TAG
 done
 
+StringVal5="cassandra"
 
+# Iterate the string variable using for loop
+for val in $StringVal5; do
+ echo $val
+ git tag -d workloads/tools/$val/$TAG
+ git push origin :workloads/tools/$val/$TAG
+done
 

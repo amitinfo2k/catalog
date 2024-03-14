@@ -7,13 +7,13 @@ metadata:
   labels:
     app: cassandra
     chart: cassandra-0.13.1
-    release: sdcore4g
+    release: omec
     heritage: Helm
 spec:
   selector:
     matchLabels:
       app: cassandra
-      release: sdcore4g
+      release: omec
   serviceName: cassandra
   replicas: 3 # kpt-set: ${cassandra-replicas}
   podManagementPolicy: OrderedReady
@@ -23,7 +23,7 @@ spec:
     metadata:
       labels:
         app: cassandra
-        release: sdcore4g
+        release: omec
     spec:
       hostNetwork: false
       containers:

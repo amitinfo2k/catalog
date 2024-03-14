@@ -7,7 +7,7 @@ metadata:
   labels:
     app: cassandra
     chart: cassandra-0.13.1
-    release: sdcore4g
+    release: omec
     heritage: Helm
 spec:
   clusterIP: None
@@ -30,4 +30,4 @@ spec:
     targetPort: 9160
   selector:
     app: cassandra
-    release: sdcore4g
+    release: omec
