@@ -60,6 +60,7 @@ apiVersion: apps/v1
 kind: StatefulSet 
 metadata:
   name: config4g
+  namespace: omec
   labels:
     release: sdcore4g
     app: config4g

@@ -4,6 +4,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: hss
+  namespace: omec
   labels:
     release: sdcore4g
     app: hss
