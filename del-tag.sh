@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TAG=v2.0.4
+TAG=v2.0.5
 
 git tag -d $TAG
 git push origin :refs/tags/$TAG
