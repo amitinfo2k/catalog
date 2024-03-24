@@ -69,7 +69,13 @@ metadata:
   namespace: default
 spec:
   template:
-    spec: {}
+    spec:
+      customImage: kindest/node:v1.26.3
+      extraMounts:
+      - containerPath: /var/run/docker.sock
+        hostPath: /var/run/docker.sock
+      - containerPath: /opt/cni/bin
+        hostPath: /opt/cni/bin
 ---
 apiVersion: cluster.x-k8s.io/v1beta1
 kind: MachineDeployment
@@ -105,7 +111,13 @@ metadata:
   namespace: default
 spec:
   template:
-    spec: {}
+    spec:
+      customImage: kindest/node:v1.26.3
+      extraMounts:
+      - containerPath: /var/run/docker.sock
+        hostPath: /var/run/docker.sock
+      - containerPath: /opt/cni/bin
+        hostPath: /opt/cni/bin
 ---
 apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
 kind: KubeadmConfigTemplate
