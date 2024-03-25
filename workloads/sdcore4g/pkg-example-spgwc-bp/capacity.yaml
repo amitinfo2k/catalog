@@ -7,4 +7,4 @@ metadata:
     specializer.nephio.org/owner: workload.nephio.org/v1alpha1.NFDeployment.spgwc-example
     specializer.nephio.org/namespace: example
 spec:
-  maxSubscribers: 10000
+  maxSessions: 500
