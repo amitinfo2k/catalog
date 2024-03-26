@@ -1,6 +1,6 @@
 apiVersion: req.nephio.org/v1alpha1
 kind: Interface
-metadata:
+metadata: # kpt-merge: /n4
   name: n4
   annotations:
     nephio.org/network-name: n4

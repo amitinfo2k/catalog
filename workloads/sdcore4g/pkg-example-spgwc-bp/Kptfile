@@ -1,6 +1,6 @@
 apiVersion: kpt.dev/v1
 kind: Kptfile
-metadata:
+metadata: # kpt-merge: /sdcore4g-spgwc
   name: pkg-spgwc
   annotations:
     config.kubernetes.io/local-config: "true"
@@ -20,3 +20,4 @@ pipeline:
     - image: docker.io/nephio/nad-fn:v2.0.0
     - image: docker.io/nephio/dnn-fn:v2.0.0
     - image: docker.io/nephio/interface-fn:v2.0.0
+    - image: docker.io/nephio/nfdeploy-fn:v2.0.0
