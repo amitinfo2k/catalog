@@ -1,0 +1,34 @@
+---
+# Source: bess-upf/templates/networks.yaml
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  namespace: test
+  name: ran-net
+spec:
+  config: '{
+    "cniVersion": "0.3.1",
+    "type": "macvlan",
+    "master": "n2",
+    "ipam": {
+        "type": "static"
+    },
+    "capabilities": { "mac": true}
+  }'
+---
+# Source: bess-upf/templates/networks.yaml
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  namespace: test
+  name: access-net
+spec:
+  config: '{
+    "cniVersion": "0.3.1",
+    "type": "macvlan",
+    "master": "n3",
+    "ipam": {
+        "type": "static"
+    },
+    "capabilities": { "mac": true}
+  }'

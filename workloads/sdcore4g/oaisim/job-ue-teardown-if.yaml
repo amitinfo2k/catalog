@@ -1,0 +1,36 @@
+---
+# Source: oaisim/templates/job-ue-teardown-if.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ue-teardown-if
+  labels:
+    release: release-name
+    app: ue
+  annotations:
+    "helm.sh/hook": "post-delete"
+    "helm.sh/hook-delete-policy": "before-hook-creation"
+spec:
+  template:
+    metadata:
+      labels:
+        release: release-name
+        app: ue
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: ue-teardown-if-job
+          image: "omecproject/lte-uesoftmodem:1.1.0"
+          securityContext:
+            privileged: true
+            runAsUser: 0
+          command: ["bash", "-xc"]
+          args:
+            - if chroot /mnt/host-rootfs lsmod | grep -q ue_ip;then chroot /mnt/host-rootfs rmmod ue_ip;fi
+          volumeMounts:
+            - name: host-rootfs
+              mountPath: /mnt/host-rootfs
+      volumes:
+        - name: host-rootfs
+          hostPath:
+            path: /

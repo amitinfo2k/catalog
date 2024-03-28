@@ -1,0 +1,138 @@
+---
+# Source: oaisim/templates/statefulset-enb.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: enb
+  namespace: default
+  labels:
+    release: release-name
+    app: enb
+---
+# Source: oaisim/templates/statefulset-enb.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: enb
+  namespace: default
+  labels:
+    release: release-name
+    app: enb
+rules:
+  - apiGroups:
+      - ""
+      - extensions
+      - batch
+      - apps
+    verbs:
+      - get
+      - list
+    resources:
+      - statefulsets
+      - jobs
+      - pods
+      - services
+      - endpoints
+      - configmaps
+---
+# Source: oaisim/templates/statefulset-enb.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: enb
+  namespace: default
+  labels:
+    release: release-name
+    app: enb
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: enb
+subjects:
+  - kind: ServiceAccount
+    name: enb
+    namespace: default
+---
+# Source: oaisim/templates/statefulset-enb.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: enb
+  labels:
+    release: release-name
+    app: enb
+spec:
+  replicas: 1
+  serviceName: oaisim-enb
+  selector:
+    matchLabels:
+      release: release-name
+      app: enb
+  template:
+    metadata:
+      labels:
+        release: release-name
+        app: enb
+    spec:
+      serviceAccountName: enb
+      hostNetwork: false
+      initContainers:
+        - name: enb-init
+          image: "omecproject/lte-softmodem:1.1.0"
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+          command:
+            - /opt/oaisim/enb/scripts/enb-init.sh
+          env:
+            - name: ENB_LOCAL_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          volumeMounts:
+            - name: script
+              mountPath: /opt/oaisim/enb/scripts/enb-init.sh
+              subPath: enb-init.sh
+            - name: config
+              mountPath: /opt/oaisim/enb/config
+            - name: pod-share
+              mountPath: /etc/oaisim/enb
+      containers:
+        - name: enb
+          image: "omecproject/lte-softmodem:1.1.0"
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            privileged: true
+          command:
+            - /opt/oaisim/enb/scripts/enb-run.sh
+            - start
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - /opt/oaisim/enb/scripts/enb-run.sh
+                  - stop
+          env:
+            - name: ENB_LOCAL_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          volumeMounts:
+            - name: script
+              mountPath: /opt/oaisim/enb/scripts/enb-run.sh
+              subPath: enb-run.sh
+            - name: pod-share
+              mountPath: /etc/oaisim/enb
+      volumes:
+        - name: config
+          configMap:
+            name: enb
+            defaultMode: 420
+        - name: script
+          configMap:
+            name: enb
+            defaultMode: 493
+        - name: pod-share
+          emptyDir: {}

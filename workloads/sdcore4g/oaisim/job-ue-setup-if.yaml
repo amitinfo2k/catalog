@@ -1,0 +1,39 @@
+---
+# Source: oaisim/templates/job-ue-setup-if.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ue-setup-if
+  labels:
+    release: release-name
+    app: ue
+  annotations:
+    "helm.sh/hook": "pre-install"
+    "helm.sh/hook-delete-policy": "before-hook-creation"
+spec:
+  template:
+    metadata:
+      labels:
+        release: release-name
+        app: ue
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: ue-setup-if-job
+          image: "omecproject/lte-uesoftmodem:1.1.0"
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            privileged: true
+            runAsUser: 0
+          command: ["bash", "-xc"]
+          args:
+            - if chroot /mnt/host-rootfs lsmod | grep -q ue_ip; then chroot /mnt/host-rootfs rmmod ue_ip; fi;
+              cp /openairinterface5g/targets/bin/ue_ip.ko /mnt/host-rootfs/tmp/ue_ip.ko;
+              chroot /mnt/host-rootfs insmod /tmp/ue_ip.ko;
+          volumeMounts:
+            - name: host-rootfs
+              mountPath: /mnt/host-rootfs
+      volumes:
+        - name: host-rootfs
+          hostPath:
+            path: /

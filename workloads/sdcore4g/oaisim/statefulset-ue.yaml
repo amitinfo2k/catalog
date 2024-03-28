@@ -1,0 +1,172 @@
+---
+# Source: oaisim/templates/statefulset-ue.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ue
+  namespace: default
+  labels:
+    release: release-name
+    app: ue
+---
+# Source: oaisim/templates/statefulset-ue.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ue
+  namespace: default
+  labels:
+    release: release-name
+    app: ue
+rules:
+  - apiGroups:
+      - ""
+      - extensions
+      - batch
+      - apps
+    verbs:
+      - get
+      - list
+    resources:
+      - statefulsets
+      - jobs
+      - pods
+      - services
+      - endpoints
+      - configmaps
+---
+# Source: oaisim/templates/statefulset-ue.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ue
+  namespace: default
+  labels:
+    release: release-name
+    app: ue
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ue
+subjects:
+  - kind: ServiceAccount
+    name: ue
+    namespace: default
+---
+# Source: oaisim/templates/statefulset-ue.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ue
+  labels:
+    release: release-name
+    app: ue
+spec:
+  replicas: 1
+  serviceName: oaisim-ue
+  selector:
+    matchLabels:
+      release: release-name
+      app: ue
+  template:
+    metadata:
+      labels:
+        release: release-name
+        app: ue
+    spec:
+      serviceAccountName: ue
+      hostNetwork: true
+      initContainers:
+        - name: ue-dep-check
+          image: "quay.io/stackanetes/kubernetes-entrypoint:v0.3.1"
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            runAsUser: 0
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+            - name: PATH
+              value: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/
+            - name: COMMAND
+              value: "echo done"
+            - name: DEPENDENCY_POD_JSON
+              value: '[{"labels": {"app": "enb"}, "requireSameNode": true}]'
+            - name: DEPENDENCY_JOBS
+              value: ue-setup-if
+          command:
+            - kubernetes-entrypoint
+          volumeMounts:
+            []
+        - name: ue-gen-usim
+          image: "omecproject/lte-uesoftmodem:1.1.0"
+          imagePullPolicy: IfNotPresent
+          command:
+            - /opt/oaisim/ue/scripts/ue-gen-usim.sh
+          volumeMounts:
+            - name: script
+              mountPath: /opt/oaisim/ue/scripts/ue-gen-usim.sh
+              subPath: ue-gen-usim.sh
+            - name: config
+              mountPath: /opt/oaisim/ue/config
+            - name: pod-share
+              mountPath: /etc/oaisim/ue
+        - name: ue-init
+          image: "omecproject/lte-uesoftmodem:1.1.0"
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            privileged: true
+          command:
+            - /opt/oaisim/ue/scripts/ue-init.sh
+          volumeMounts:
+            - name: script
+              mountPath: /opt/oaisim/ue/scripts/ue-init.sh
+              subPath: ue-init.sh
+      containers:
+        - name: ue
+          image: "omecproject/lte-uesoftmodem:1.1.0"
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            privileged: true
+          command:
+            - /opt/oaisim/ue/scripts/ue-run.sh
+            - start
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - /opt/oaisim/enb/scripts/ue-run.sh
+                  - stop
+          env:
+            - name: UE_LOCAL_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          volumeMounts:
+            - name: script
+              mountPath: /opt/oaisim/ue/scripts/ue-run.sh
+              subPath: ue-run.sh
+            - name: config
+              mountPath: /opt/oaisim/ue/config
+            - name: pod-share
+              mountPath: /etc/oaisim/ue
+      volumes:
+        - name: config
+          configMap:
+            name: ue
+            defaultMode: 420
+        - name: script
+          configMap:
+            name: ue
+            defaultMode: 493
+        - name: pod-share
+          emptyDir: {}

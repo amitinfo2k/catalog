@@ -1,0 +1,181 @@
+---
+# Source: oaisim/templates/configmap-ue.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ue
+  labels:
+    release: release-name
+    app: ue
+data:
+  ue_comac_test.conf: |
+    PLMN: {
+      PLMN0: {
+             FULLNAME="COMAC Test Network";
+             SHORTNAME="COMAC";
+             MCC="208";
+             MNC="01";
+      };
+    };
+    UE0: {
+      USER: {
+            IMEI="356113022094149";
+            MANUFACTURER="OAISIM";
+            MODEL="OAISIM";
+            PIN="0000";
+      };
+      SIM: {
+           MSIN="4567891201";
+           USIM_API_K="465b5ce8b199b49faa5f0a2ee238a6bc";
+           OPC="d4416644f6154936193433dd20a0ace0";
+           MSISDN="1122334456";
+      };
+      HPLMN= "20801";
+      UCPLMN_LIST = ();
+      OPLMN_LIST = ("20801");
+      OCPLMN_LIST = ();
+      FPLMN_LIST = ();
+      EHPLMN_LIST= ();
+    };
+  nfapi.conf: |
+    log_config = {
+      global_log_level                      ="info";
+      global_log_verbosity                  ="medium";
+      hw_log_level                          ="info";
+      hw_log_verbosity                      ="medium";
+      phy_log_level                         ="info";
+      phy_log_verbosity                     ="medium";
+      mac_log_level                         ="info";
+      mac_log_verbosity                     ="medium";
+      rlc_log_level                         ="info";
+      rlc_log_verbosity                     ="medium";
+      pdcp_log_level                        ="info";
+      pdcp_log_verbosity                    ="medium";
+      rrc_log_level                         ="info";
+      rrc_log_verbosity                     ="full";
+    };
+
+    L1s = (
+      {
+        num_cc = 1;
+        tr_n_preference = "nfapi";
+        local_n_if_name  = "lo";
+        remote_n_address = "127.0.0.2";
+        local_n_address  = "127.0.0.1";
+        local_n_portc    = 50000;
+        remote_n_portc   = 50001;
+        local_n_portd    = 50010;
+        remote_n_portd   = 50011;
+      }
+    );
+
+    RUs = (
+      {
+        local_rf       = "yes"
+        nb_tx          = 1
+        nb_rx          = 1
+        att_tx         = 90
+        att_rx         = 0;
+        bands          = [7,38,42,43];
+        max_pdschReferenceSignalPower = -27;
+        max_rxgain                    = 125;
+      }
+    );
+  ue-gen-usim.sh: |
+    #!/bin/bash
+    #
+    # Copyright 2019-present Open Networking Foundation
+    #
+    # Licensed under the Apache License, Version 2.0 (the "License");
+    # you may not use this file except in compliance with the License.
+    # You may obtain a copy of the License at
+    #
+    # http://www.apache.org/licenses/LICENSE-2.0
+    #
+    # Unless required by applicable law or agreed to in writing, software
+    # distributed under the License is distributed on an "AS IS" BASIS,
+    # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    # See the License for the specific language governing permissions and
+    # limitations under the License.
+    
+    set -ex
+    
+    # Generate USIM data
+    conf_nvram_path=/opt/oaisim/ue/config/ue_comac_test.conf
+    gen_nvram_path=/etc/oaisim/ue
+    
+    cd /openairinterface5g/cmake_targets
+    ./nvram --gen -c $conf_nvram_path -o $gen_nvram_path
+    ./usim --gen -c $conf_nvram_path -o $gen_nvram_path
+    
+  ue-init.sh: |
+    #!/bin/bash
+    #
+    # Copyright 2019-present Open Networking Foundation
+    #
+    # Licensed under the Apache License, Version 2.0 (the "License");
+    # you may not use this file except in compliance with the License.
+    # You may obtain a copy of the License at
+    #
+    # http://www.apache.org/licenses/LICENSE-2.0
+    #
+    # Unless required by applicable law or agreed to in writing, software
+    # distributed under the License is distributed on an "AS IS" BASIS,
+    # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    # See the License for the specific language governing permissions and
+    # limitations under the License.
+    
+    set -ex
+    
+    LTE_IF=oip1
+    
+    ip link set $LTE_IF up
+    if ! grep -q lte /etc/iproute2/rt_tables; then
+      echo "200 lte " >> /etc/iproute2/rt_tables
+    fi
+    
+    ip rule add fwmark 1 table lte
+    ip route add default dev $LTE_IF table lte || true
+    
+    # enable inet6 for lo interface
+    # lte-uesoftmodem uses AF_INET6 for UDP socket
+    echo 0 > /proc/sys/net/ipv6/conf/lo/disable_ipv6
+    
+  ue-run.sh: |
+    #!/bin/bash
+    #
+    # Copyright 2019-present Open Networking Foundation
+    #
+    # Licensed under the Apache License, Version 2.0 (the "License");
+    # you may not use this file except in compliance with the License.
+    # You may obtain a copy of the License at
+    #
+    # http://www.apache.org/licenses/LICENSE-2.0
+    #
+    # Unless required by applicable law or agreed to in writing, software
+    # distributed under the License is distributed on an "AS IS" BASIS,
+    # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    # See the License for the specific language governing permissions and
+    # limitations under the License.
+    
+    set -ex
+    
+    COMMAND="${@:-start}"
+    
+    function start () {
+      cd /openairinterface5g/cmake_targets
+      cp /opt/oaisim/ue/config/nfapi.conf /etc/oaisim/ue/nfapi.conf
+    
+      # Copy USIM data
+      cp /etc/oaisim/ue/.u* .
+      cp /etc/oaisim/ue/.u* ./lte_build_oai/build/
+    
+      exec ./lte_build_oai/build/lte-uesoftmodem -O /etc/oaisim/ue/nfapi.conf --L2-emul 3 --num-ues 1 --nums_ue_thread 1
+    }
+    
+    function stop () {
+      # TODO: clean up ip tables and rules
+      kill -TERM 1
+    }
+    
+    $COMMAND
