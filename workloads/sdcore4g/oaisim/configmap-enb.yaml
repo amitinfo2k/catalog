@@ -168,7 +168,7 @@ data:
         ////////// MME parameters:
         mme_ip_address = (
           {
-            ipv4       = "127.0.0.1";
+            ipv4       = "172.2.0.254";
             ipv6       = "192:168:30::17";
             active     = "yes";
             preference = "ipv4";
