@@ -73,6 +73,19 @@ spec:
       labels:
         release: release-name
         app: enb
+            annotations:
+        k8s.v1.cni.cncf.io/networks: '[
+          {
+            "name": "ran-net",
+            "interface": "n2",
+            "ips": []
+          },
+          {
+            "name": "access-net",
+            "interface": "n3",
+            "ips": []
+          }
+        ]'
     spec:
       serviceAccountName: enb
       hostNetwork: false
