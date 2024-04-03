@@ -3,7 +3,7 @@
 apiVersion: "k8s.cni.cncf.io/v1"
 kind: NetworkAttachmentDefinition
 metadata:
-  namespace: test
+  namespace: default
   name: ran-net
 spec:
   config: '{
@@ -20,7 +20,7 @@ spec:
 apiVersion: "k8s.cni.cncf.io/v1"
 kind: NetworkAttachmentDefinition
 metadata:
-  namespace: test
+  namespace: default
   name: access-net
 spec:
   config: '{
