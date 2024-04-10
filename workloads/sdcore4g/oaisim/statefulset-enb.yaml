@@ -73,7 +73,7 @@ spec:
       labels:
         release: release-name
         app: enb
-            annotations:
+      annotations:
         k8s.v1.cni.cncf.io/networks: '[
           {
             "name": "ran-net",
